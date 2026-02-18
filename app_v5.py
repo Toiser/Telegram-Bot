@@ -440,6 +440,20 @@ def looks_like_country(text: str) -> bool:
     return True
 
 
+# Prefixes to strip when extracting a country name from a sentence
+_COUNTRY_PREFIXES = re.compile(
+    r"^(soy de|vivo en|estoy en|juego desde|desde|de|en)\s+",
+    re.IGNORECASE,
+)
+
+
+def extract_country(text: str) -> str:
+    """Strip common lead-in phrases and return just the country name."""
+    cleaned = _COUNTRY_PREFIXES.sub("", text.strip())
+    # Title-case the result so it looks clean in the DB
+    return cleaned.strip().title() or text.strip().title()
+
+
 def detect_site(text: str) -> Optional[str]:
     norm = normalize(text)
     if "888" in text:
@@ -887,10 +901,11 @@ async def text_router(update: Update, context: ContextTypes.DEFAULT_TYPE) -> Non
 
     # --- Quick slot inference (reduce AI round-trips) ---
     if not lead.get("country") and looks_like_country(msg) and not is_greeting(msg):
-        upsert_lead(u.id, u.username, u.first_name, country=msg.strip())
+        country_name = extract_country(msg)
+        upsert_lead(u.id, u.username, u.first_name, country=country_name)
         lead = get_lead(u.id) or {}
         context.user_data.pop("awaiting_country", None)
-        ack = f"Perfecto, {msg.strip()} — saber el país ayuda a ajustar las promos."
+        ack = f"Perfecto, {country_name} — saber el país ayuda a ajustar las promos."
         await update.message.reply_text(ack, disable_web_page_preview=True)
         append_history(u.id, "assistant", ack)
         await ask_site(update, context)
