@@ -1,0 +1,6 @@
+python-telegram-bot==20.7
+python-dotenv==1.0.1
+openai>=1.40.0
+pydantic>=2.8.2
+langdetect==1.0.9
+psycopg2-binary>=2.9.9

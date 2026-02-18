@@ -1,0 +1,26 @@
+# Secrets — never commit these
+.env
+
+# SQLite DB — Railway filesystem is ephemeral anyway
+leads.db
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# macOS
+.DS_Store
+
+# Old versions (optional: remove if you want them in git)
+app.py
+app_v2.py
+app_v3.py
+app_v4.py
